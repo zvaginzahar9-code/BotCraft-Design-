@@ -1,0 +1,16 @@
+# Единые окончания строк в репозитории: в индексе всегда LF, независимо от
+# настроек core.autocrlf на конкретной машине.
+* text=auto eol=lf
+
+# Бинарные ассеты Git не должен нормализовать или пытаться слить построчно.
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.mp4   binary
+*.glb   binary
+*.db    binary
+*.ico   binary
+
+# Сгенерированный лок-файл: не засоряет диффы в pull request.
+package-lock.json linguist-generated=true -diff

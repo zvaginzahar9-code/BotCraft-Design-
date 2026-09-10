@@ -1,0 +1,421 @@
+@import 'tailwindcss';
+
+/* ======================================================================== *
+ * BotCraft Design — система
+ *
+ * Один язык на весь продукт: лендинг, редактор плана и 3D-студия берут
+ * значения отсюда и нигде не изобретают собственных. Правило простое: если
+ * величина повторяется дважды, она становится токеном.
+ *
+ * Палитра — графит на бумаге плюс ровно один акцент. Акцент сигнальный
+ * (вермильон): он маркирует то, что сейчас активно, и то, что можно нажать,
+ * поэтому его в интерфейсе всегда мало. В 3D тот же цвет означает выделенный
+ * объект — так же, как в любом DCC-пакете, и он не спорит с деревом и тканью
+ * в кадре, в отличие от синего или фиолетового.
+ * ======================================================================== */
+
+@theme {
+  /* --- Поверхности и текст ------------------------------------------- */
+  --color-ink: #16171a;
+  --color-ink-soft: #33353c;
+  /* Оба серых доведены до контраста 4.5:1 (WCAG AA) на всех трёх фонах —
+     surface, paper и canvas. Разница между уровнями сохранена, поэтому
+     иерархия «основной → приглушённый → тихий» читается как прежде. */
+  --color-muted: #5c5e66;
+  --color-faint: #6b6d75;
+
+  --color-surface: #ffffff;
+  --color-paper: #f8f8f6;
+  --color-canvas: #f1f1ef;
+  --color-line: #e3e3e0;
+  --color-hairline: #ececea;
+
+  /* --- Акцент ---------------------------------------------------------- */
+  --color-accent: #d6421f;
+  --color-accent-deep: #b4330f;
+  --color-accent-soft: #fdf0eb;
+  --color-accent-line: #f3c9b9;
+
+  /* --- Служебные состояния --------------------------------------------- */
+  --color-ok: #17795e;
+  --color-danger: #c22f2f;
+  --color-danger-soft: #fdf0ef;
+
+  /* --- Шрифты ----------------------------------------------------------- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, monospace;
+
+  /* --- Радиусы: три ступени, больше в системе нет ----------------------- */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  /* --- Тени: подкрашены в цвет подложки, чёрных теней в проекте нет ----- */
+  --shadow-raise: 0 1px 2px rgba(22, 23, 26, 0.05), 0 2px 6px -2px rgba(22, 23, 26, 0.06);
+  --shadow-panel: 0 2px 4px rgba(22, 23, 26, 0.04), 0 16px 40px -24px rgba(22, 23, 26, 0.35);
+  --shadow-pop: 0 4px 10px -4px rgba(22, 23, 26, 0.12), 0 24px 60px -32px rgba(22, 23, 26, 0.45);
+
+  /* --- Движение --------------------------------------------------------- */
+  /* Одна кривая на вход элементов, одна на перемещение по экрану. Обе
+     заметно резче встроенных: у стандартных ease не хватает характера. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* Ни одна страница продукта не имеет права ехать вбок: на телефоне это
+   мгновенно превращается в «сайт сломался». */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Серая вспышка по касанию — артефакт мобильного Safari и Chrome, у нас есть
+   собственная отдача на :active. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: 'ss01' 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  border-color: var(--color-line);
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* Видимый фокус: одно кольцо на весь продукт. Никогда не гасится — это
+   единственный ориентир при навигации с клавиатуры. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ======================================================================== *
+ * Текстовые роли
+ * ======================================================================== */
+
+/* Цифры, размеры, координаты. Моноширинный набор здесь не украшение:
+   значение в поле не дёргается, пока его тянут ползунком или гизмо. */
+@utility num {
+  font-family: var(--font-mono);
+  font-feature-settings: 'tnum' 1;
+  letter-spacing: -0.01em;
+}
+
+/* Заголовок панели внутри инструментов. */
+@utility panel-title {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+/* ======================================================================== *
+ * Кнопки
+ *
+ * Форма одна на весь продукт: скруглённый прямоугольник (не пилюля), 1px
+ * граница у вторичных, заметная отдача по нажатию. Пилюли остались только
+ * у фильтров каталога — там форма отличается намеренно, чтобы фильтр не
+ * читался кнопкой действия.
+ * ======================================================================== */
+
+@utility btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color 0.16s var(--ease-out),
+    border-color 0.16s var(--ease-out),
+    color 0.16s var(--ease-out),
+    transform 0.16s var(--ease-out),
+    box-shadow 0.16s var(--ease-out);
+}
+@utility btn-base {
+  &:active:not(:disabled) {
+    transform: scale(0.975);
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+}
+
+@utility btn-primary {
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-raise);
+}
+@utility btn-primary {
+  &:hover:not(:disabled) {
+    background: #000;
+  }
+}
+
+@utility btn-accent {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: var(--shadow-raise);
+}
+@utility btn-accent {
+  &:hover:not(:disabled) {
+    background: var(--color-accent-deep);
+  }
+}
+
+@utility btn-ghost {
+  border: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+@utility btn-ghost {
+  &:hover:not(:disabled) {
+    background: var(--color-canvas);
+    border-color: #d3d3cf;
+  }
+}
+
+/* Прозрачная кнопка для плотных панелей: рамки нет, есть подложка на hover. */
+@utility btn-quiet {
+  color: var(--color-muted);
+}
+@utility btn-quiet {
+  &:hover:not(:disabled) {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+  }
+}
+
+@utility btn-outline-invert {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+@utility btn-outline-invert {
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+}
+
+/* ======================================================================== *
+ * Поверхности
+ * ======================================================================== */
+
+/* Плавающая панель поверх холста: чуть плотнее карточки и с тенью, потому
+   что она физически лежит выше рабочей поверхности. */
+@utility panel {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility field {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  transition:
+    border-color 0.16s var(--ease-out),
+    box-shadow 0.16s var(--ease-out);
+}
+@utility field {
+  &::placeholder {
+    color: var(--color-faint);
+  }
+  &:hover:not(:focus) {
+    border-color: #d3d3cf;
+  }
+  &:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
+}
+
+/* Миллиметровка. Один мотив на лендинге и в редакторе плана — страница и
+   инструмент выглядят частями одного продукта. */
+@utility blueprint {
+  background-image:
+    linear-gradient(to right, rgba(22, 23, 26, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(22, 23, 26, 0.055) 1px, transparent 1px);
+  background-size: 26px 26px;
+}
+
+@utility blueprint-invert {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+/* ======================================================================== *
+ * Полосы прокрутки и мелочи
+ * ======================================================================== */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.slim-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.slim-scroll::-webkit-scrollbar-thumb {
+  background: #d8d8d4;
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 99px;
+}
+.slim-scroll::-webkit-scrollbar-thumb:hover {
+  background: #c2c2be;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.slim-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ======================================================================== *
+ * Ползунки
+ *
+ * Собственный вид вместо системного по одной причине: системная ручка в
+ * Chrome — 12 пикселей, а палец попадает по ней только случайно. Здесь ручка
+ * 18px на десктопе и 26px в режиме `range-lg`, который включают панели,
+ * рассчитанные на касание. Дорожка при этом остаётся тонкой: толстая полоса
+ * под мебелью в кадре читается как элемент интерфейса поверх сцены.
+ * ======================================================================== */
+
+input[type='range'] {
+  accent-color: var(--color-accent);
+}
+
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 28px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--color-line);
+}
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--color-line);
+}
+
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid var(--color-accent);
+  box-shadow: var(--shadow-raise);
+  transition: transform 0.14s var(--ease-out);
+}
+.range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1.5px solid var(--color-accent);
+  box-shadow: var(--shadow-raise);
+}
+
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.range-lg {
+  height: 44px;
+}
+.range-lg::-webkit-slider-thumb {
+  width: 26px;
+  height: 28px;
+  margin-top: -11px;
+}
+.range-lg::-moz-range-thumb {
+  width: 26px;
+  height: 28px;
+}
+
+/* Пульсация плейсхолдеров. Медленнее стандартной tailwind-анимации: быстрое
+   мигание в сетке из двадцати карточек читается как ошибка. */
+@keyframes skeleton {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton {
+  background: var(--color-canvas);
+  animation: skeleton 1.6s var(--ease-in-out) infinite;
+}
+
+/* Бегущая лента превью каталога на лендинге. */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-track {
+  animation: marquee-x var(--marquee-duration, 60s) linear infinite;
+  will-change: transform;
+}
+.marquee-host:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .skeleton {
+    animation: none;
+  }
+}

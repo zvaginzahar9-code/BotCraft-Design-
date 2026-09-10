@@ -1,0 +1,48 @@
+{
+  "name": "botcraft-design",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "assets:video": "node scripts/assets/optimize-video.mjs",
+    "assets:models": "node scripts/assets/optimize-models.mjs",
+    "assets:thumbs": "node scripts/assets/generate-thumbnails.mjs",
+    "assets:shots": "node scripts/assets/shoot-hero.mjs",
+    "assets:app": "node scripts/assets/shoot-app.mjs",
+    "assets:all": "npm run assets:video && npm run assets:models && npm run assets:thumbs && npm run db:seed",
+    "db:seed": "node scripts/db/seed.mjs",
+    "verify": "node scripts/verify/verify-flow.mjs && node scripts/verify/verify-openings.mjs && node scripts/verify/verify-studio.mjs && node scripts/verify/verify-project.mjs"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@react-three/drei": "^10.7.8",
+    "@react-three/fiber": "^9.7.0",
+    "@types/react-dom": "^19.2.4",
+    "framer-motion": "^13.1.0",
+    "lenis": "^1.3.26",
+    "next": "^15.1.6",
+    "pg": "^8.23.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "three": "^0.171.0",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.4.2",
+    "@gltf-transform/extensions": "^4.4.2",
+    "@gltf-transform/functions": "^4.4.2",
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.10.7",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.2.18",
+    "@types/three": "^0.171.0",
+    "meshoptimizer": "^1.2.0",
+    "puppeteer-core": "^24.1.0",
+    "sharp": "^0.35.3",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.3"
+  }
+}
